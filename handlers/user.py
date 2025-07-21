@@ -17,13 +17,35 @@ async def send_start(message: Message):
 @router.message(F.text.in_({"/menu", "/katalog"}))
 async def show_products(message: Message):
     products = get_products()
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text=f"{product['name']} - {product['price']}",
-            callback_data=f"order_{product['id']}"
-        )] for product in products
-    ])
-    await message.answer("📋 Mahsulotlar roʻyxati:", reply_markup=keyboard)
+
+    if not products:
+        await message.answer("📭 Hozircha mahsulotlar mavjud emas.")
+        return
+
+    for product in products:
+        caption = (
+            f"📦 <b>{product['name']}</b>\n"
+            f"💵 Narx: {product['price']} so‘m\n"
+            f"📏 O‘lcham: {product['size']}\n"
+            f"✅ Mavjud: {'Ha' if product.get('available') else 'Yo‘q'}"
+        )
+
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🛒 Buyurtma berish",
+                callback_data=f"order_{product['id']}"
+            )]
+        ])
+
+        try:
+            await message.answer_photo(
+                photo=product["photo"],
+                caption=caption,
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
+        except Exception as e:
+            await message.answer(f"⚠️ Rasm chiqarishda xatolik: {e}")
 
 @router.message(OrderState.waiting_for_name)
 async def process_name(message: Message, state: FSMContext):
