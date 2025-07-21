@@ -24,10 +24,10 @@ async def show_products(message: Message):
 
     for product in products:
         caption = (
-            f"📦 <b>{product['name']}</b>\n"
-            f"💵 Narx: {product['price']} so‘m\n"
-            f"📏 O‘lcham: {product['size']}\n"
-            f"✅ Mavjud: {'Ha' if product.get('available') else 'Yo‘q'}"
+            f"📦 <b>{product.get('name', 'Nomaʼlum')}</b>\n"
+            f"💵 Narx: {product.get('price', 'Nomaʼlum')} so‘m\n"
+            f"📏 O‘lcham: {product.get('size', 'Ko‘rsatilmagan')}\n"
+            f"✅ Mavjud: {'Ha' if product.get('available', False) else 'Yo‘q'}"
         )
 
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -37,15 +37,27 @@ async def show_products(message: Message):
             )]
         ])
 
-        try:
-            await message.answer_photo(
-                photo=product["photo"],
-                caption=caption,
+        if 'photo' in product:
+            try:
+                await message.answer_photo(
+                    photo=product['photo'],
+                    caption=caption,
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
+            except Exception as e:
+                await message.answer(
+                    text=f"⚠️ Rasm chiqarishda xatolik:\n{caption}",
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
+        else:
+            await message.answer(
+                text=caption,
                 parse_mode="HTML",
                 reply_markup=keyboard
             )
-        except Exception as e:
-            await message.answer(f"⚠️ Rasm chiqarishda xatolik: {e}")
+
 
 @router.message(OrderState.waiting_for_name)
 async def process_name(message: Message, state: FSMContext):
@@ -53,11 +65,13 @@ async def process_name(message: Message, state: FSMContext):
     await message.answer("📞 Endi telefon raqamingizni yuboring.")
     await state.set_state(OrderState.waiting_for_phone)
 
+
 @router.message(OrderState.waiting_for_phone)
 async def process_phone(message: Message, state: FSMContext):
     await state.update_data(phone=message.text)
     await message.answer("📍 Endi manzilingizni yuboring.")
     await state.set_state(OrderState.waiting_for_address)
+
 
 @router.message(OrderState.waiting_for_address)
 async def process_address(message: Message, state: FSMContext):
@@ -67,10 +81,10 @@ async def process_address(message: Message, state: FSMContext):
 
         order_msg = (
             f"🛍 <b>Yangi buyurtma!</b>\n\n"
-            f"📦 Mahsulot ID: {data.get('product_id')}\n"
-            f"👤 Ism: {data.get('name')}\n"
-            f"📞 Tel: {data.get('phone')}\n"
-            f"📍 Manzil: {data.get('address')}"
+            f"📦 Mahsulot ID: {data.get('product_id', 'Nomaʼlum')}\n"
+            f"👤 Ism: {data.get('name', 'Nomaʼlum')}\n"
+            f"📞 Tel: {data.get('phone', 'Nomaʼlum')}\n"
+            f"📍 Manzil: {data.get('address', 'Nomaʼlum')}"
         )
 
         await message.bot.send_message(chat_id=ADMIN_ID, text=order_msg, parse_mode="HTML")
