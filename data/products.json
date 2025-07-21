@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "name": "Penyuar qizil",
+    "price": "120,000 so'm",
+    "image": "https://example.com/image1.jpg"
+  },
+  {
+    "id": "2",
+    "name": "Piyjama moviy",
+    "price": "100,000 so'm",
+    "image": "https://example.com/image2.jpg"
+  }
+]
