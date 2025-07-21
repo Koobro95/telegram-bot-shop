@@ -10,3 +10,4 @@ class AddProduct(StatesGroup):
     price = State()
     size = State()
     availability = State()
+    photo = State()
