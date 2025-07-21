@@ -1,14 +1,22 @@
-from aiogram import executor
-from loader import dp
+import asyncio
 import logging
+from aiogram import Bot, Dispatcher
+from config import BOT_TOKEN
 from handlers import user, order, admin
-dp.include_router(admin.router)
 
-logging.basicConfig(level=logging.INFO)
+async def main():
+    logging.basicConfig(level=logging.INFO)
 
-user.register_user_handlers(dp)
-order.register_order_handlers(dp)
-admin.register_admin_handlers(dp)
+    bot = Bot(token=BOT_TOKEN)
+    dp = Dispatcher()
+
+    # Routerlarni registratsiya qilish
+    dp.include_router(user.router)
+    dp.include_router(order.router)
+    dp.include_router(admin.router)
+
+    # Botni ishga tushirish
+    await dp.start_polling(bot)
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
