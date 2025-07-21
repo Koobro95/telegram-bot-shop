@@ -2,6 +2,7 @@ from aiogram import executor
 from loader import dp
 import logging
 from handlers import user, order, admin
+dp.include_router(admin.router)
 
 logging.basicConfig(level=logging.INFO)
 
