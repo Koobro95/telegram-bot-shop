@@ -8,7 +8,7 @@ import os
 
 router = Router()
 
-PRODUCT_FILE = "products.json"
+PRODUCT_FILE = "data/products.json"
 
 def load_products():
     if not os.path.exists(PRODUCT_FILE):
